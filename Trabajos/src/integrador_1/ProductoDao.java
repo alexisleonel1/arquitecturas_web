@@ -4,9 +4,9 @@ package integrador_1;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class Producto {
+public class ProductoDao {
 
-	public Producto(Connection conn) throws SQLException {
+	public ProductoDao(Connection conn) throws SQLException {
 		this.createTable(conn);
 	}
 

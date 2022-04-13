@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -16,6 +17,18 @@ public class main {
 		Conexion conexion = new Conexion();
 		
 		//crearTablas(conexion);
+		
+		try {
+			Connection conn = conexion.getConnection();
+			ClienteDao c = new ClienteDao();
+			//c.get(1);
+			Optional rs = c.get(0);
+			Optional rs2 = c.get(1);
+			System.out.println(rs);
+			System.out.println(rs2);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 		/*CSVParser parser;
 		try {
@@ -36,7 +49,7 @@ public class main {
 		try {
 			Connection conn = conexion.getConnection();
 			conn.setAutoCommit(false);
-			Cliente cliente = new Cliente(conn);
+			ClienteDao cliente = new ClienteDao(conn);
 			conexion.endConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -45,7 +58,7 @@ public class main {
 		try {
 			Connection conn = conexion.getConnection();
 			conn.setAutoCommit(false);
-			Factura factura = new Factura(conn);
+			FacturaDao factura = new FacturaDao(conn);
 			conexion.endConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -54,7 +67,16 @@ public class main {
 		try {
 			Connection conn = conexion.getConnection();
 			conn.setAutoCommit(false);
-			Producto producto = new Producto(conn);
+			ProductoDao producto = new ProductoDao(conn);
+			conexion.endConnection();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			Connection conn = conexion.getConnection();
+			conn.setAutoCommit(false);
+			Factura_productoDao factura_producto = new Factura_productoDao(conn);
 			conexion.endConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();

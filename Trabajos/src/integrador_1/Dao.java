@@ -1,13 +1,14 @@
 package integrador_1;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 public interface Dao<T> {
     
-    Optional<T> get(long id);
+    Optional<T> get(int id) throws SQLException;
     
-    List<T> getAll();
+    List<T> getAll() throws SQLException;
     
     void save(T t);
     

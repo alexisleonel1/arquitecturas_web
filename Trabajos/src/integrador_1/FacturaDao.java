@@ -1,12 +1,11 @@
 package integrador_1;
 
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class Factura {
+public class FacturaDao {
 	
-	public Factura(Connection conn) throws SQLException {
+	public FacturaDao(Connection conn) throws SQLException {
 		this.createTable(conn);
 	}
 	
@@ -14,8 +13,8 @@ public class Factura {
 		String table = "CREATE TABLE factura(" +
 		"idFactura INT NOT NULL,"+
 		"idCliente INT NOT NULL,"+
-		"PRIMARY kEY(idFactura))";
-		/*"FOREIGN KEY (idCliente) REFERENCES cliente (idCliente)";*/
+		"PRIMARY kEY(idFactura),"+
+		"FOREIGN KEY (idCliente) REFERENCES cliente (idCliente))";
 		conn.prepareStatement(table).execute();
 		conn.commit();
 	}
