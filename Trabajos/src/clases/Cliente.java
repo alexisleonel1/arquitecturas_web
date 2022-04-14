@@ -1,4 +1,4 @@
-package integrador_1;
+package clases;
 
 public class Cliente {
 	

@@ -1,4 +1,4 @@
-package integrador_1;
+package factory;
 
 
 import java.lang.reflect.InvocationTargetException;
@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Conexion {
+public class MySqlJDBC extends DaoFactory {
 	
 	private Connection conn;
 	
@@ -25,12 +25,6 @@ public class Conexion {
 		
 		this.conn = DriverManager.getConnection(uri,"root","");
 		this.conn.setAutoCommit(false);
-	}
-	
-	public void endConnection() throws SQLException {
-		if(this.conn != null) {
-			this.conn.close();
-		}
 	}
 	
 	public Connection getConnection() throws SQLException {

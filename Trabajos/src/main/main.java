@@ -1,4 +1,4 @@
-package integrador_1;
+package main;
 
 
 import java.io.FileReader;
@@ -12,14 +12,21 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import clases.Cliente;
+import daos.ClienteDao;
+import daos.FacturaDao;
+import daos.Factura_productoDao;
+import daos.ProductoDao;
+import factory.MySqlJDBC;
+
 public class main {
 
 	public static ClienteDao c = null;
 	
 	public static void main(String[] args) {
-		Conexion conexion = new Conexion();
+		MySqlJDBC conexion = new MySqlJDBC();
 		
-		//crearTablas(conexion);
+		crearTablas(conexion);
 		
 		try {
 			Connection conn = conexion.getConnection();
@@ -32,7 +39,6 @@ public class main {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
 		CSVParser parser;
 		try {
 			parser = CSVFormat.DEFAULT.withHeader().parse(new
@@ -50,11 +56,12 @@ public class main {
 	
 	}
 	
-	public static void crearTablas(Conexion conexion) {
+	public static void crearTablas(MySqlJDBC conexion) {
 		try {
 			Connection conn = conexion.getConnection();
 			conn.setAutoCommit(false);
 			ClienteDao cliente = new ClienteDao();
+			cliente.createTable();
 			conexion.endConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
