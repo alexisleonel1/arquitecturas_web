@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.csv.CSVFormat;
@@ -13,6 +14,8 @@ import org.apache.commons.csv.CSVRecord;
 
 public class main {
 
+	public static ClienteDao c = null;
+	
 	public static void main(String[] args) {
 		Conexion conexion = new Conexion();
 		
@@ -20,28 +23,30 @@ public class main {
 		
 		try {
 			Connection conn = conexion.getConnection();
-			ClienteDao c = new ClienteDao();
+			c = new ClienteDao();
 			//c.get(1);
-			Optional rs = c.get(0);
-			Optional rs2 = c.get(1);
+			List<Cliente> rs = c.getAll();
+			//Optional rs2 = c.get(1);
 			System.out.println(rs);
-			System.out.println(rs2);
+			//System.out.println(rs2);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		/*CSVParser parser;
+		CSVParser parser;
 		try {
 			parser = CSVFormat.DEFAULT.withHeader().parse(new
-					FileReader("src/integrador_1/csv/productos.csv"));
+					FileReader("src/integrador_1/csv/clientes.csv"));
 			for(CSVRecord row: parser) {
-				System.out.println(row.get("idProducto"));
-				System.out.println(row.get("nombre"));
-				System.out.println(row.get("valor"));
+				String[] data = {row.get("idCliente"),row.get("nombre"),row.get("email")};
+				c.save(data);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
 	}
 	
@@ -49,7 +54,7 @@ public class main {
 		try {
 			Connection conn = conexion.getConnection();
 			conn.setAutoCommit(false);
-			ClienteDao cliente = new ClienteDao(conn);
+			ClienteDao cliente = new ClienteDao();
 			conexion.endConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,10 +14,10 @@ public class ClienteDao implements Dao {
 	
 	public ClienteDao() throws SQLException {
 		this.conexion = new Conexion();
-		//this.createTable();
 	}
 
-	private void createTable() throws SQLException {
+	@Override
+	public void createTable() throws SQLException {
 		Connection conn = conexion.getConnection();
 		String table = "CREATE TABLE cliente(" +
 		"idCliente INT NOT NULL,"+
@@ -29,43 +30,48 @@ public class ClienteDao implements Dao {
 	}
 
 	@Override
-	public Optional get(int id) throws SQLException {
+	public Optional<Cliente> get(int id) throws SQLException {
 		Connection conn = conexion.getConnection();
 		String select = "SELECT * FROM cliente WHERE idCliente = ?";
 		PreparedStatement ps = conn.prepareStatement(select);
 		ps.setInt(1, id);
 		ResultSet rs = ps.executeQuery();
 		rs.next();
-		String r = rs.getInt(1)+", "+rs.getString(2)+", "+rs.getString(3);
+		Cliente c = new Cliente(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4));
 		conn.close();
-		return Optional.ofNullable(r);
+		return Optional.ofNullable(c);
 	}
 
 	@Override
-	public List getAll() throws SQLException {
+	public List<Cliente> getAll() throws SQLException {
+		List<Cliente> clientes = new ArrayList<Cliente>();
 		Connection conn = conexion.getConnection();
-		String select = "SELECT * FROM cliente";
+		String select = "SELECT c.*, COUNT(f.idFactura)"
+				+ "FROM cliente c LEFT JOIN factura f "
+				+ "ON (c.idCliente = f.idCliente) "
+				+ "GROUP BY c.idCliente "
+				+ "ORDER BY COUNT(f.idFactura) DESC";
 		PreparedStatement ps = conn.prepareStatement(select);
 		ResultSet rs = ps.executeQuery();
+		while(rs.next()) {
+			Cliente c = new Cliente(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4));
+			clientes.add(c);
+		}
 		conn.close();
-		return null;
+		return clientes;
 	}
 
 	@Override
-	public void save(Object t) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void update(Object t, String[] params) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(Object t) {
-		// TODO Auto-generated method stub
-		
+	public void save(String[] t) throws SQLException {
+		Connection conn = conexion.getConnection();
+		String insert = "INSERT INTO cliente (idCliente,nombre,email) VALUES (?, ?, ?)";
+		PreparedStatement ps = conn.prepareStatement(insert);
+		ps.setInt(1, Integer.parseInt(t[0]));
+		ps.setString(2, t[1]);
+		ps.setString(3, t[2]);
+		ps.executeUpdate();
+		ps.close();
+		conn.commit();
+		conn.close();
 	}
 }

@@ -24,6 +24,7 @@ public class Conexion {
 		String uri = "jdbc:mysql://localhost:3306/exampleDB";
 		
 		this.conn = DriverManager.getConnection(uri,"root","");
+		this.conn.setAutoCommit(false);
 	}
 	
 	public void endConnection() throws SQLException {
