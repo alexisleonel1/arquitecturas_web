@@ -14,7 +14,7 @@ public class Factura {
 		return this.idFactura;
 	}
 	
-	public int setIdFactura(int idFactura) {
+	public void setIdFactura(int idFactura) {
 	 this.idFactura = idFactura;
 	}
 	
@@ -22,7 +22,7 @@ public class Factura {
 		return this.idCliente;
 	}
 
-	public int setIdCliente(int idCliente) {
+	public void setIdCliente(int idCliente) {
 		 this.idCliente = idCliente;
 		}
 	

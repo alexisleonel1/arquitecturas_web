@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import clases.Factura_producto;
 import factory.MySqlJDBC;
 import interfaz.Dao;
@@ -11,8 +14,8 @@ import interfaz.Dao;
 public class Factura_productoDao implements Dao<Factura_producto> {
 	private MySqlJDBC conexion;
 
-	public Factura_productoDao() throws SQLException {
-		this.conexion = new MySqlJDBC();
+	public Factura_productoDao(MySqlJDBC conn) {
+		this.conexion = conn;
 	}
 
 	@Override
@@ -27,16 +30,22 @@ public class Factura_productoDao implements Dao<Factura_producto> {
 	}
 
 	@Override
-	public void save(String[] t) throws SQLException {
+	public void save(CSVParser dataFactura_producto) throws SQLException {
 		Connection conn = conexion.getConnection();
-		String insert = "INSERT INTO factura_producto (idFactura,idProducto,cantidad) VALUES (?, ?, ?)";
-		PreparedStatement ps = conn.prepareStatement(insert);
-		ps.setInt(1, Integer.parseInt(t[0]));
-		ps.setInt(2, Integer.parseInt(t[1]));
-		ps.setInt(3, Integer.parseInt(t[2]));
-		ps.executeUpdate();
-		ps.close();
+		for(CSVRecord row: dataFactura_producto) {
+			this.insert(conn, Integer.parseInt(row.get("idProducto")), Integer.parseInt(row.get("idFactura")), Integer.parseInt(row.get("cantidad")));
+		}
 		conn.commit();
 		conn.close();
+	}
+	
+	private void insert(Connection conn, int idProducto, int idFactura, int cantidad)  throws SQLException {
+		String insert = "INSERT INTO factura_producto (idFactura,idProducto,cantidad) VALUES (?, ?, ?)";
+		PreparedStatement ps = conn.prepareStatement(insert);
+		ps.setInt(1, idFactura);
+		ps.setInt(2, idProducto);
+		ps.setInt(3, cantidad);
+		ps.executeUpdate();
+		ps.close();
 	}
 }

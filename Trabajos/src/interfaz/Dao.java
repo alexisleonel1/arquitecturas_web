@@ -1,13 +1,13 @@
 package interfaz;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
+
+import org.apache.commons.csv.CSVParser;
 
 public interface Dao<T> {
 	
 	void createTable() throws SQLException;
     
-    void save(String[] t) throws SQLException;
+    void save(CSVParser t) throws SQLException;
     
 }

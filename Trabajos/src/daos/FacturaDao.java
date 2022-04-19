@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import clases.Factura;
 import factory.MySqlJDBC;
 import interfaz.Dao;
@@ -11,8 +14,8 @@ import interfaz.Dao;
 public class FacturaDao implements Dao<Factura> {
 	private MySqlJDBC conexion;
 
-	public FacturaDao() throws SQLException {
-		this.conexion = new MySqlJDBC();
+	public FacturaDao(MySqlJDBC conn) {
+		this.conexion = conn;
 	}
 
 	@Override
@@ -26,16 +29,22 @@ public class FacturaDao implements Dao<Factura> {
 	}
 
 	@Override
-	public void save(String[] t) throws SQLException {
+	public void save(CSVParser dataFactura) throws SQLException {
 		Connection conn = conexion.getConnection();
-		String insert = "INSERT INTO factura (idFactura,idCliente) VALUES (?, ?)";
-		PreparedStatement ps = conn.prepareStatement(insert);
-		ps.setInt(1, Integer.parseInt(t[0]));
-		ps.setInt(2, Integer.parseInt(t[1]));
-		ps.executeUpdate();
-		ps.close();
+		for(CSVRecord row: dataFactura) {
+			this.insert(conn,Integer.parseInt(row.get("idFactura")),Integer.parseInt(row.get("idCliente")));
+		}
 		conn.commit();
 		conn.close();
+	}
+	
+	private void insert(Connection conn, int idFactura, int idCliente)  throws SQLException {
+		String insert = "INSERT INTO factura (idFactura,idCliente) VALUES (?, ?)";
+		PreparedStatement ps = conn.prepareStatement(insert);
+		ps.setInt(1, idFactura);
+		ps.setInt(2, idCliente);
+		ps.executeUpdate();
+		ps.close();
 	}
 
 }

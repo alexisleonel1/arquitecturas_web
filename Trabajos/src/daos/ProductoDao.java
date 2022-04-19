@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import clases.Producto;
 import factory.MySqlJDBC;
 import interfaz.Dao;
@@ -15,14 +18,14 @@ public class ProductoDao implements Dao<Producto> {
 
 	private MySqlJDBC conexion;
 
-	public ProductoDao() throws SQLException {
-		this.conexion = new MySqlJDBC();
+	public ProductoDao(MySqlJDBC conn) {
+		this.conexion = conn;
 	}
 
 	@Override
 	public void createTable() throws SQLException {
 		Connection conn = conexion.getConnection();
-		String table = "CREATE TABLE IF NOT EXIST producto(" + "idProducto INT," + "nombre VARCHAR(45),"
+		String table = "CREATE TABLE IF NOT EXISTS producto(" + "idProducto INT," + "nombre VARCHAR(45),"
 				+ "valor FLOAT," + "PRIMARY kEY(idProducto))";
 		conn.prepareStatement(table).execute();
 		conn.commit();
@@ -30,18 +33,24 @@ public class ProductoDao implements Dao<Producto> {
 	}
 
 	@Override
-	public void save(String[] t) throws SQLException {
+	public void save(CSVParser dataProducto) throws SQLException {
 		Connection conn = conexion.getConnection();
-		String insert = "INSERT INTO producto (idProducto,nombre,valor) VALUES (?, ?, ?)";
-		PreparedStatement ps = conn.prepareStatement(insert);
-		ps.setInt(1, Integer.parseInt(t[0]));
-		ps.setString(2, t[1]);
-		ps.setFloat(3, Float.parseFloat(t[2]));
-		ps.executeUpdate();
-		ps.close();
+		for(CSVRecord row: dataProducto) {
+			this.insert(conn,Integer.parseInt(row.get("idProducto")),row.get("nombre"),Float.parseFloat(row.get("valor")));
+		}
 		conn.commit();
 		conn.close();
 
+	}
+	
+	private void insert(Connection conn, int idProducto, String nombre, float valor)  throws SQLException {
+		String insert = "INSERT INTO producto (idProducto,nombre,valor) VALUES (?, ?, ?)";
+		PreparedStatement ps = conn.prepareStatement(insert);
+		ps.setInt(1, idProducto);
+		ps.setString(2, nombre);
+		ps.setFloat(3, valor);
+		ps.executeUpdate();
+		ps.close();
 	}
 
 	public Producto mayorRecaudacion() throws SQLException {

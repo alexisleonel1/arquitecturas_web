@@ -17,6 +17,10 @@ public class Cliente {
 	public String getNombre() {
 		return this.nombre;
 	}
+	
+	public int getCantidad() {
+		return this.cantidad;
+	}
 
 	public String getEmail() {
 		return this.email;

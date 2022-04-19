@@ -16,7 +16,7 @@ public class Factura_producto {
 		return this.idFactura;
 	}
 	
-	public int setIdFactura(int idFactura) {
+	public void setIdFactura(int idFactura) {
 	 this.idFactura = idFactura;
 	}
 	
@@ -24,20 +24,20 @@ public class Factura_producto {
 		return this.idProducto;
 	}
 	
-	public int setIdProducto(int idProducto) {
+	public void setIdProducto(int idProducto) {
 	 this.idProducto = idProducto;
 	}
 	
 	public int getCantidad() {
-		return this.idCantidad;
+		return this.cantidad;
 	}
 	
-	public int setCantidad(int Cantidad) {
+	public void setCantidad(int Cantidad) {
 	 this.cantidad = cantidad;
 	}
 	
 	@Override
 	public String toString() {
-		return this.idFactura + ", " this.idProducto + ", " + this.cantidad; 
+		return this.idFactura + ", " + this.idProducto + ", " + this.cantidad; 
 	}
 }

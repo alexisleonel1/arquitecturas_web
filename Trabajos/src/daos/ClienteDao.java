@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 import clases.Cliente;
 import factory.MySqlJDBC;
@@ -16,14 +18,14 @@ public class ClienteDao implements Dao<Cliente> {
 	
 	private MySqlJDBC conexion;
 	
-	public ClienteDao() throws SQLException {
-		this.conexion = new MySqlJDBC();
+	public ClienteDao(MySqlJDBC conn) {
+		this.conexion = conn;
 	}
 
 	@Override
 	public void createTable() throws SQLException {
 		Connection conn = conexion.getConnection();
-		String table = "CREATE TABLE IF NOT EXIST cliente(" +
+		String table = "CREATE TABLE IF NOT EXISTS cliente(" +
 		"idCliente INT NOT NULL,"+
 		"nombre VARCHAR(500),"+
 		"email VARCHAR(150),"+
@@ -53,16 +55,22 @@ public class ClienteDao implements Dao<Cliente> {
 	}
 
 	@Override
-	public void save(String[] t) throws SQLException {
+	public void save(CSVParser dataCliente) throws SQLException {
 		Connection conn = conexion.getConnection();
-		String insert = "INSERT INTO cliente (idCliente,nombre,email) VALUES (?, ?, ?)";
-		PreparedStatement ps = conn.prepareStatement(insert);
-		ps.setInt(1, Integer.parseInt(t[0]));
-		ps.setString(2, t[1]);
-		ps.setString(3, t[2]);
-		ps.executeUpdate();
-		ps.close();
+		for(CSVRecord row: dataCliente) {
+			this.insert(conn,Integer.parseInt(row.get("idCliente")),row.get("nombre"),row.get("email"));
+		}
 		conn.commit();
 		conn.close();
+	}
+	
+	private void insert(Connection conn, int id, String nombre, String email)  throws SQLException {
+		String insert = "INSERT INTO cliente (idCliente,nombre,email) VALUES (?, ?, ?)";
+		PreparedStatement ps = conn.prepareStatement(insert);
+		ps.setInt(1, id);
+		ps.setString(2, nombre);
+		ps.setString(3, email);
+		ps.executeUpdate();
+		ps.close();
 	}
 }

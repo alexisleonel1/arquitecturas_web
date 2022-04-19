@@ -13,83 +13,103 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import clases.Cliente;
+import clases.Factura;
+import clases.Factura_producto;
+import clases.Producto;
 import daos.ClienteDao;
 import daos.FacturaDao;
 import daos.Factura_productoDao;
 import daos.ProductoDao;
+import factory.DaoFactory;
 import factory.MySqlJDBC;
+import interfaz.Dao;
 
 public class main {
 
 	public static ClienteDao c = null;
 	
 	public static void main(String[] args) {
-		MySqlJDBC conexion = new MySqlJDBC();
+		DaoFactory msqlFactory = DaoFactory.getDaoFactory(1);
 		
-		crearTablas(conexion);
+		ClienteDao cliente = (ClienteDao) msqlFactory.getCustomerDAO("cliente");
+		Dao<Factura> factura = msqlFactory.getCustomerDAO("factura");
+		Dao<Factura_producto> factura_producto = msqlFactory.getCustomerDAO("factura_producto");
+		ProductoDao producto = (ProductoDao) msqlFactory.getCustomerDAO("producto");
 		
 		try {
-			Connection conn = conexion.getConnection();
-			c = new ClienteDao();
-			//c.get(1);
-			List<Cliente> rs = c.getAll();
-			//Optional rs2 = c.get(1);
-			System.out.println(rs);
-			//System.out.println(rs2);
+			cliente.createTable();
+			producto.createTable();
+			factura.createTable();
+			factura_producto.createTable();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		CSVParser parser;
+		
+		CSVParser dataCliente = null;
+		CSVParser dataProducto = null;
+		CSVParser dataFactura = null;
+		CSVParser dataFactura_producto = null;
+		
 		try {
-			parser = CSVFormat.DEFAULT.withHeader().parse(new
+			dataCliente = CSVFormat.DEFAULT.withHeader().parse(new
 					FileReader("src/integrador_1/csv/clientes.csv"));
-			for(CSVRecord row: parser) {
-				String[] data = {row.get("idCliente"),row.get("nombre"),row.get("email")};
-				c.save(data);
-			}
+			
+			dataProducto = CSVFormat.DEFAULT.withHeader().parse(new
+					FileReader("src/integrador_1/csv/productos.csv"));
+			
+			dataFactura = CSVFormat.DEFAULT.withHeader().parse(new
+					FileReader("src/integrador_1/csv/facturas.csv"));
+			
+			dataFactura_producto = CSVFormat.DEFAULT.withHeader().parse(new
+					FileReader("src/integrador_1/csv/facturas-productos.csv"));
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-	
-	}
-	
-	public static void crearTablas(MySqlJDBC conexion) {
+		
+		
+		
 		try {
-			Connection conn = conexion.getConnection();
-			conn.setAutoCommit(false);
-			ClienteDao cliente = new ClienteDao();
-			cliente.createTable();
-			conexion.endConnection();
+			cliente.save(dataCliente);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			Connection conn = conexion.getConnection();
-			conn.setAutoCommit(false);
-			FacturaDao factura = new FacturaDao(conn);
-			conexion.endConnection();
+			factura.save(dataFactura);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			Connection conn = conexion.getConnection();
-			conn.setAutoCommit(false);
-			ProductoDao producto = new ProductoDao(conn);
-			conexion.endConnection();
+			producto.save(dataProducto);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			Connection conn = conexion.getConnection();
-			conn.setAutoCommit(false);
-			Factura_productoDao factura_producto = new Factura_productoDao(conn);
-			conexion.endConnection();
+			factura_producto.save(dataFactura_producto);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			List<Cliente> mc = cliente.mejoresClientes();
+			System.out.println("Mejores clientes --------------------------");
+			for(Cliente row: mc) {
+				System.out.println("Cantidad: " + row.getCantidad() + ", ID: " + row.getID() + ", Nombre: " + row.getNombre() + ", Email: " + row.getEmail());
+			}
+			System.out.println("Fin mejores clientes --------------------------");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			Producto mayorRecaudacion = producto.mayorRecaudacion();
+			System.out.println("Mayor recaudacion -------------------------------------");
+			System.out.println("ID: " + mayorRecaudacion.getIdProducto()+ ", Nombre: " + mayorRecaudacion.getNombre() + ", Valor: " + mayorRecaudacion.getValor());
+			System.out.println("Fin mayor recaudacion -------------------------------------");
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
